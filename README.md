@@ -22,5 +22,5 @@ cd TechStore
 
 ## Ссылки
 
-Макет Figma: https://www.figma.com/design/cKE0InCLOzHhhxT90o0jC7/TechStore?node-id=1-1018&t=U1eZYdnSvAVVJ8Lx-1
+Макет Figma: https://www.figma.com/design/XEcQVGQpriXKtmwLId2pgL/TechStore?node-id=10-4&p=f&t=pOhfZybesYpGfkEu-0
 Репозиторий: https://github.com/idkvero/TechStore
