@@ -1,14 +1,289 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой проект</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <h1>Добро пожаловать в проект!</h1>
-    <p>Это стартовая страница.</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="TechStore — интернет-магазин техники" />
+    <title>TechStore — Интернет-магазин техники</title>
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/header.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/footer.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">  </head>
+  <body>
+    <a href="#main-content" class="skip-link"
+      >Перейти к основному содержимому</a
+    >
+
+<header class="header" itemscope itemtype="https://schema.org/WPHeader">
+  <div class="header__container">
+    <a href="/" class="header__logo" aria-label="TechStore — главная страница">TECHSTORE</a>
+
+    <button class="header__burger" aria-label="Открыть меню" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="header__nav" aria-label="Основная навигация">
+      <ul class="nav__list">
+        <li class="nav__item"><a href="#products" class="nav__link">Products</a></li>
+        <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
+        <li class="nav__item"><a href="#contact" class="nav__link">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="header__auth">
+      <a href="/login" class="header__signin" aria-label="Войти в аккаунт">Sign In</a>
+      <a href="/register" class="header__signup button button--primary" aria-label="Зарегистрироваться">Sign Up</a>
+    </div>
+  </div>
+
+  <div class="header__mobile-menu">
+    <nav aria-label="Мобильная навигация">
+      <ul class="nav__list">
+        <li class="nav__item"><a href="#products" class="nav__link">Products</a></li>
+        <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
+        <li class="nav__item"><a href="#contact" class="nav__link">Contact</a></li>
+        <li class="nav__item"><a href="/login" class="nav__link">Sign In</a></li>
+        <li class="nav__item"><a href="/register" class="nav__link button button--primary">Sign Up</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+    <main class="main" id="main-content" itemprop="mainContentOfPage">
+      <section class="hero" aria-label="Главный баннер">
+        <div class="hero__container">
+          <h1 class="hero__title">NEXT-GEN TECH</h1>
+          <p class="hero__subtitle">Premium gadgets for the digital age</p>
+          <a
+            href="#products"
+            class="hero__button button"
+            aria-label="Перейти к каталогу товаров"
+            >SHOP NOW</a
+          >
+        </div>
+      </section>
+
+      <section class="features" aria-labelledby="features-heading">
+        <div class="features__container">
+          <h2 id="features-heading" class="features__title">WHY CHOOSE US</h2>
+
+          <div class="features__grid">
+            <article class="feature-card">
+              <div class="feature-card__icon" aria-hidden="true">🎯</div>
+              <h3 class="feature-card__title">Precision</h3>
+              <p class="feature-card__desc">Surgical performance</p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-card__icon" aria-hidden="true">🛡️</div>
+              <h3 class="feature-card__title">Encrypted</h3>
+              <p class="feature-card__desc">Secure architecture</p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-card__icon" aria-hidden="true">⚡</div>
+              <h3 class="feature-card__title">Instant</h3>
+              <p class="feature-card__desc">Zero latency delivery</p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-card__icon" aria-hidden="true">☁️</div>
+              <h3 class="feature-card__title">Storage</h3>
+              <p class="feature-card__desc">Cloud synced profiles</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="products"
+        id="products"
+        aria-labelledby="products-heading"
+      >
+        <div class="products__container">
+          <h2 id="products-heading" class="products__title">
+            FEATURED PRODUCTS
+          </h2>
+
+          <div class="products__grid">
+            <article
+              class="product-card"
+              itemscope
+              itemtype="https://schema.org/Product"
+            >
+              <figure class="product-card__figure">
+                <img
+                  src="images/headphones.jpg"
+                  alt="Беспроводные наушники Cyber Headphones с шумоподавлением"
+                  class="product-card__image"
+                  itemprop="image"
+                />
+                <figcaption class="product-card__caption">
+                  Премиальные беспроводные наушники
+                </figcaption>
+              </figure>
+              <h3 class="product-card__title" itemprop="name">
+                Cyber Headphones
+              </h3>
+              <p class="product-card__desc" itemprop="description">
+                Беспроводные наушники с активным шумоподавлением и 30 часами
+                автономной работы
+              </p>
+              <div
+                itemprop="offers"
+                itemscope
+                itemtype="https://schema.org/Offer"
+              >
+                <p class="product-card__price">
+                  <span itemprop="priceCurrency" content="USD">$</span>
+                  <span itemprop="price" content="299">299</span>
+                </p>
+              </div>
+              <button
+                class="product-card__button button"
+                aria-label="Добавить Cyber Headphones в корзину"
+              >
+                ADD TO CART
+              </button>
+            </article>
+
+            <article
+              class="product-card"
+              itemscope
+              itemtype="https://schema.org/Product"
+            >
+              <figure class="product-card__figure">
+                <img
+                  src="images/laptop.jpg"
+                  alt="Игровой ноутбук Gaming Laptop с мощным процессором и видеокартой"
+                  class="product-card__image"
+                  itemprop="image"
+                />
+                <figcaption class="product-card__caption">
+                  Мощный игровой ноутбук
+                </figcaption>
+              </figure>
+              <h3 class="product-card__title" itemprop="name">Gaming Laptop</h3>
+              <p class="product-card__desc" itemprop="description">
+                Игровой ноутбук с процессором Intel Core i9 и видеокартой NVIDIA
+                RTX 4080
+              </p>
+              <div
+                itemprop="offers"
+                itemscope
+                itemtype="https://schema.org/Offer"
+              >
+                <p class="product-card__price">
+                  <span itemprop="priceCurrency" content="USD">$</span>
+                  <span itemprop="price" content="1499">1,499</span>
+                </p>
+              </div>
+              <button
+                class="product-card__button button"
+                aria-label="Добавить Gaming Laptop в корзину"
+              >
+                ADD TO CART
+              </button>
+            </article>
+
+            <article
+              class="product-card"
+              itemscope
+              itemtype="https://schema.org/Product"
+            >
+              <figure class="product-card__figure">
+                <img
+                  src="images/watch.jpg"
+                  alt="Умные часы Smart Watch Pro с сенсорным дисплеем и отслеживанием здоровья"
+                  class="product-card__image"
+                  itemprop="image"
+                />
+                <figcaption class="product-card__caption">
+                  Умные часы премиум-класса
+                </figcaption>
+              </figure>
+              <h3 class="product-card__title" itemprop="name">
+                Smart Watch Pro
+              </h3>
+              <p class="product-card__desc" itemprop="description">
+                Умные часы с сенсорным AMOLED-дисплеем и мониторингом сердечного
+                ритма 24/7
+              </p>
+              <div
+                itemprop="offers"
+                itemscope
+                itemtype="https://schema.org/Offer"
+              >
+                <p class="product-card__price">
+                  <span itemprop="priceCurrency" content="USD">$</span>
+                  <span itemprop="price" content="399">399</span>
+                </p>
+              </div>
+              <button
+                class="product-card__button button"
+                aria-label="Добавить Smart Watch Pro в корзину"
+              >
+                ADD TO CART
+              </button>
+            </article>
+
+            <article
+              class="product-card"
+              itemscope
+              itemtype="https://schema.org/Product"
+            >
+              <figure class="product-card__figure">
+                <img
+                  src="images/earbuds.jpg"
+                  alt="Беспроводные наушники-вкладыши Wireless Earbuds с зарядным кейсом"
+                  class="product-card__image"
+                  itemprop="image"
+                />
+                <figcaption class="product-card__caption">
+                  Компактные беспроводные наушники
+                </figcaption>
+              </figure>
+              <h3 class="product-card__title" itemprop="name">
+                Wireless Earbuds
+              </h3>
+              <p class="product-card__desc" itemprop="description">
+                Компактные наушники с поддержкой шумоподавления и зарядным
+                кейсом на 24 часа
+              </p>
+              <div
+                itemprop="offers"
+                itemscope
+                itemtype="https://schema.org/Offer"
+              >
+                <p class="product-card__price">
+                  <span itemprop="priceCurrency" content="USD">$</span>
+                  <span itemprop="price" content="199">199</span>
+                </p>
+              </div>
+              <button
+                class="product-card__button button"
+                aria-label="Добавить Wireless Earbuds в корзину"
+              >
+                ADD TO CART
+              </button>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" itemscope itemtype="https://schema.org/WPFooter">
+      <div class="footer__container">
+        <p class="footer__copyright">
+          &copy; 2026 TECHSTORE. ALL RIGHTS RESERVED.
+        </p>
+      </div>
+    </footer>
+
     <script src="js/script.js"></script>
-</body>
-</html>
+  </body>
+</html
