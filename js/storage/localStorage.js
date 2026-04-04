@@ -2,7 +2,7 @@
 
 const CART_KEY = 'techstore_cart';
 const CACHE_KEY = 'techstore_api_cache';
-const SEARCH_KEY = 'techstore_last_search';
+const CACHE_TTL = 10 * 60 * 1000; // 10 минут
 
 export const StorageService = {
   // ── Корзина ──────────────────────────────────────────────
@@ -11,81 +11,81 @@ export const StorageService = {
       localStorage.setItem(CART_KEY, JSON.stringify(cart));
       console.log('[LocalStorage] Корзина сохранена:', cart.length, 'товаров');
     } catch (e) {
-      console.error('[LocalStorage] Ошибка сохранения корзины:', e);
+      console.error('[LocalStorage] Ошибка корзины:', e);
     }
   },
 
   loadCart() {
     try {
-      const data = localStorage.getItem(CART_KEY);
-      const cart = data ? JSON.parse(data) : [];
+      const cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
       console.log('[LocalStorage] Корзина загружена:', cart.length, 'товаров');
       return cart;
-    } catch (e) {
-      console.error('[LocalStorage] Ошибка загрузки корзины:', e);
+    } catch {
       return [];
     }
   },
 
   clearCart() {
     localStorage.removeItem(CART_KEY);
-    console.log('[LocalStorage] Корзина очищена');
   },
 
-  // ── Кеш API-товаров (для офлайн-режима) ──────────────────
+  // ── API-кеш ───────────────────────────────────────────────
+  // Сохраняется только если пользователь сам делал поиск (query !== null)
   saveApiCache(query, products) {
     try {
       const cache = { query, products, savedAt: Date.now() };
       localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-      localStorage.setItem(SEARCH_KEY, query);
       console.log(
-        '[LocalStorage] API-кеш сохранён:',
+        '[LocalStorage] Кеш сохранён:',
         products.length,
         'товаров, запрос:',
-        query || '(все)'
+        `"${query || 'все'}"`
       );
     } catch (e) {
-      console.error('[LocalStorage] Ошибка сохранения кеша:', e);
+      console.error('[LocalStorage] Ошибка кеша:', e);
     }
   },
 
+  // Загружает кеш только если он свежий (< 10 минут)
   loadApiCache() {
     try {
       const data = localStorage.getItem(CACHE_KEY);
       if (!data) return null;
       const cache = JSON.parse(data);
-      const ageMin = Math.round((Date.now() - cache.savedAt) / 60000);
+      const age = Date.now() - cache.savedAt;
+      if (age > CACHE_TTL) {
+        localStorage.removeItem(CACHE_KEY);
+        console.log('[LocalStorage] Кеш устарел (> 10 мин), удалён');
+        return null;
+      }
+      const ageMin = Math.round(age / 60000);
       console.log(
-        '[LocalStorage] Кеш загружен, возраст:',
+        '[LocalStorage] Кеш загружен:',
+        cache.products.length,
+        'товаров, возраст:',
         ageMin,
-        'мин, товаров:',
-        cache.products.length
+        'мин'
       );
       return cache;
-    } catch (e) {
-      console.error('[LocalStorage] Ошибка загрузки кеша:', e);
+    } catch {
       return null;
     }
   },
 
   loadLastSearch() {
-    return localStorage.getItem(SEARCH_KEY) || '';
-  },
-
-  // ── Проверка доступности ──────────────────────────────────
-  isAvailable() {
     try {
-      localStorage.setItem('__test__', '1');
-      localStorage.removeItem('__test__');
-      return true;
+      const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      return cache?.query || null; // null если не было поиска
     } catch {
-      return false;
+      return null;
     }
   },
 
   // ── Универсальные методы (для APITester) ─────────────────
   set(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {}
   },
 
   get(key) {
@@ -94,6 +94,16 @@ export const StorageService = {
       return d ? JSON.parse(d) : null;
     } catch {
       return null;
+    }
+  },
+
+  isAvailable() {
+    try {
+      localStorage.setItem('__test__', '1');
+      localStorage.removeItem('__test__');
+      return true;
+    } catch {
+      return false;
     }
   },
 };

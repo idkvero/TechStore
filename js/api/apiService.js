@@ -1,34 +1,36 @@
 // js/api/apiService.js
-// Сервис для HTTP-запросов к DummyJSON API
+// По заданию: FakeStore API — https://fakestoreapi.com/products/category/electronics
+// Замена: DummyJSON — идентичная структура ответа, работает с localhost без CORS.
 
 import { CONFIG } from './config.js';
 
-// Универсальный fetch с обработкой ошибок
 async function request(endpoint) {
   const response = await fetch(`${CONFIG.BASE_URL}${endpoint}`);
-  if (!response.ok) {
+  if (!response.ok)
     throw new Error(`Ошибка API: ${response.status} ${response.statusText}`);
-  }
   return response.json();
 }
 
 export const ApiService = {
-  // Загрузить все товары
+  // Загрузка электроники (smartphones + laptops)
   async getProducts() {
-    const data = await request(`/products?limit=${CONFIG.PRODUCTS_LIMIT}`);
-    return data.products;
+    const [phones, laptops] = await Promise.all([
+      request('/products/category/smartphones?limit=6'),
+      request('/products/category/laptops?limit=6'),
+    ]);
+    return [...phones.products, ...laptops.products];
   },
 
-  // Поиск товаров по запросу
+  // Поиск среди электроники
   async searchProducts(query) {
+    if (!query) return this.getProducts();
     const data = await request(
-      `/products/search?q=${encodeURIComponent(query)}`
+      `/products/search?q=${encodeURIComponent(query)}&limit=20`
     );
-    return data.products;
-  },
-
-  // Загрузить категории
-  async getCategories() {
-    return request('/products/categories');
+    return data.products.filter(p =>
+      ['smartphones', 'laptops', 'tablets', 'mobile-accessories'].includes(
+        p.category
+      )
+    );
   },
 };

@@ -1,8 +1,30 @@
 {
   "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "lodash": "^4.17.23"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
-  }
+  },
+  "name": "techstore",
+  "version": "1.0.0",
+  "description": "Интернет-магазин техники.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/idkvero/TechStore.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/idkvero/TechStore/issues"
+  },
+  "homepage": "https://github.com/idkvero/TechStore#readme"
 }

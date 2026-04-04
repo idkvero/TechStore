@@ -1,29 +1,11 @@
-// js/script.js — Главный модуль приложения
-// <script type="module" src="js/script.js"></script>
-
+// js/script.js
 import { ApiService } from './api/apiService.js';
-import {
-  parseProducts,
-  filterProducts,
-  getCategories,
-} from './utils/dataParser.js';
 import { StorageService } from './storage/localStorage.js';
 import { SessionStorageService } from './storage/sessionStorage.js';
 import { APITester } from './utils/apiTester.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
-  // ============================================================
-  // Часть 2. DOM — демонстрация в консоли
-  // ============================================================
-  console.log('[DOM] Найдено элементов:', {
-    header: document.querySelector('.header'),
-    cards: document.querySelectorAll('.product-card'),
-    container: document.querySelector('.main'),
-  });
-
-  // ============================================================
-  // Корзина (LocalStorage)
-  // ============================================================
+  // ── Корзина ──────────────────────────────────────────────
   let cart = StorageService.loadCart();
 
   function renderCart() {
@@ -31,9 +13,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     const cartTotal = document.querySelector('.cart__total-price');
     const cartCount = document.querySelector('.cart__count');
     if (!cartItems) return;
-
     cartItems.innerHTML = '';
-    if (cart.length === 0) {
+    if (!cart.length) {
       cartItems.innerHTML = '<p class="cart__empty">Корзина пуста</p>';
     } else {
       cart.forEach(item => {
@@ -103,7 +84,6 @@ document.addEventListener('DOMContentLoaded', async function () {
   document.querySelector('.cart-toggle')?.addEventListener('click', openCart);
   document.querySelector('.cart__close')?.addEventListener('click', closeCart);
   cartOverlay?.addEventListener('click', closeCart);
-
   document.querySelector('.cart__items')?.addEventListener('click', e => {
     const id = parseInt(e.target.dataset.id);
     if (e.target.classList.contains('cart__remove')) removeFromCart(id);
@@ -111,7 +91,6 @@ document.addEventListener('DOMContentLoaded', async function () {
       changeQty(id, e.target.dataset.action);
   });
 
-  // Статичные товары
   const staticProducts = [
     {
       id: 101,
@@ -128,7 +107,6 @@ document.addEventListener('DOMContentLoaded', async function () {
       image: 'images/earbuds.png',
     },
   ];
-
   document.querySelector('.products__grid')?.addEventListener('click', e => {
     if (!e.target.classList.contains('product-card__button')) return;
     const name = e.target
@@ -146,17 +124,13 @@ document.addEventListener('DOMContentLoaded', async function () {
       }, 1200);
     }
   });
-
   renderCart();
 
-  // ============================================================
-  // Слайдер
-  // ============================================================
+  // ── Слайдер ──────────────────────────────────────────────
   const slides = document.querySelectorAll('.slider__slide');
   const dots = document.querySelectorAll('.slider__dot');
   let cur = 0,
     sliderTimer = null;
-
   function goToSlide(i) {
     slides.forEach(s => s.classList.remove('slider__slide--active'));
     dots.forEach(d => d.classList.remove('slider__dot--active'));
@@ -164,33 +138,26 @@ document.addEventListener('DOMContentLoaded', async function () {
     slides[cur]?.classList.add('slider__slide--active');
     dots[cur]?.classList.add('slider__dot--active');
   }
-
   if (slides.length) {
     goToSlide(0);
     sliderTimer = setInterval(() => goToSlide(cur + 1), 3500);
-    const restartSlider = fn => {
+    const restart = fn => {
       clearInterval(sliderTimer);
       fn();
       sliderTimer = setInterval(() => goToSlide(cur + 1), 3500);
     };
     document
       .querySelector('.slider__prev')
-      ?.addEventListener('click', () =>
-        restartSlider(() => goToSlide(cur - 1))
-      );
+      ?.addEventListener('click', () => restart(() => goToSlide(cur - 1)));
     document
       .querySelector('.slider__next')
-      ?.addEventListener('click', () =>
-        restartSlider(() => goToSlide(cur + 1))
-      );
+      ?.addEventListener('click', () => restart(() => goToSlide(cur + 1)));
     dots.forEach((d, i) =>
-      d.addEventListener('click', () => restartSlider(() => goToSlide(i)))
+      d.addEventListener('click', () => restart(() => goToSlide(i)))
     );
   }
 
-  // ============================================================
-  // API секция — DummyJSON + кеш в LocalStorage (офлайн!)
-  // ============================================================
+  // ── API секция ────────────────────────────────────────────
   const apiGrid = document.getElementById('api-products-grid');
   const apiStatus = document.getElementById('api-status');
   const searchInput = document.getElementById('api-search-input');
@@ -229,16 +196,18 @@ document.addEventListener('DOMContentLoaded', async function () {
     apiGrid.innerHTML = products
       .map(
         p => `
-      <article class="product-card" data-id="${p.id}">
+      <article class="product-card">
         <figure class="product-card__figure">
-          <img src="${p.thumbnail || p.image}" alt="${p.title}" class="product-card__image" loading="lazy">
+          <img src="${p.thumbnail || p.image || ''}" alt="${p.title}" class="product-card__image" loading="lazy">
         </figure>
         <h3 class="product-card__title">${p.title}</h3>
         <p class="product-card__desc">${(p.description || '').slice(0, 70)}...</p>
-        <p class="product-card__price">$${Math.round(p.price)}</p>
+        <p class="product-card__price">$${p.price ? Math.round(p.price) : '—'}</p>
         <button class="product-card__button button api-add-btn"
-          data-id="${p.id}" data-name="${p.title}"
-          data-price="${Math.round(p.price)}" data-image="${p.thumbnail || p.image}">
+          data-id="${p.id}"
+          data-name="${p.title}"
+          data-price="${Math.round(p.price) || 0}"
+          data-image="${p.thumbnail || p.image || ''}">
           ADD TO CART
         </button>
       </article>`
@@ -246,19 +215,24 @@ document.addEventListener('DOMContentLoaded', async function () {
       .join('');
   }
 
-  async function loadApiProducts(query = '') {
+  async function loadApiProducts(query) {
+    // query === null означает "пользователь ещё ничего не искал" — не загружаем
+    if (query === null) {
+      if (apiGrid) apiGrid.innerHTML = '';
+      setStatus('Введите запрос для поиска товаров');
+      return;
+    }
+
     renderApiSkeletons();
     setStatus(query ? `Поиск: "${query}"...` : 'Загрузка товаров...');
-    console.log('[API] Запрос:', query || '(все товары)');
+    console.log('[API] Запрос:', query || '(все electronics)');
 
     try {
       const products = query
         ? await ApiService.searchProducts(query)
         : await ApiService.getProducts();
 
-      // Сохраняем в LocalStorage — доступно при офлайне после обновления!
       StorageService.saveApiCache(query, products);
-      SessionStorageService.saveSearch(query);
 
       renderApiProducts(products);
       setStatus(
@@ -266,26 +240,22 @@ document.addEventListener('DOMContentLoaded', async function () {
           ? `Найдено: ${products.length} товаров по запросу "${query}"`
           : `Загружено ${products.length} товаров`
       );
-      console.log('[API] Успешно загружено:', products.length, 'товаров');
+      console.log('[API] Успешно:', products.length, 'товаров');
     } catch (error) {
       console.error('[API] Ошибка:', error.message);
-
-      // Офлайн: загружаем из LocalStorage-кеша
       const cache = StorageService.loadApiCache();
       if (cache) {
         renderApiProducts(cache.products);
-        setStatus(
-          `⚠ Офлайн-режим. Показаны кешированные данные (запрос: "${cache.query || 'все'}")`
-        );
         if (searchInput) searchInput.value = cache.query || '';
+        setStatus(
+          `⚠ Офлайн. Кеш: ${cache.products.length} товаров (запрос: "${cache.query || 'все'}")`
+        );
         console.log('[Офлайн] Загружен кеш:', cache.products.length, 'товаров');
       } else {
-        apiGrid.innerHTML = `
-          <div class="api-error">
-            ⚠ Нет соединения и нет кешированных данных.
-            <button class="button button--primary" id="retry-api" style="margin-top:12px">Повторить</button>
-          </div>`;
-        setStatus('Ошибка загрузки данных', true);
+        if (apiGrid)
+          apiGrid.innerHTML = `<div class="api-error">⚠ Нет соединения и нет кешированных данных.
+          <button class="button button--primary" id="retry-api" style="margin-top:12px">Повторить</button></div>`;
+        setStatus('Ошибка загрузки', true);
         document
           .getElementById('retry-api')
           ?.addEventListener('click', () => loadApiProducts(query));
@@ -293,9 +263,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   }
 
-  searchBtn?.addEventListener('click', () =>
-    loadApiProducts(searchInput?.value.trim() || '')
-  );
+  searchBtn?.addEventListener('click', () => {
+    const q = searchInput?.value.trim() || '';
+    loadApiProducts(q);
+  });
   searchInput?.addEventListener('keydown', e => {
     if (e.key === 'Enter') loadApiProducts(searchInput.value.trim() || '');
   });
@@ -317,12 +288,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     }, 1200);
   });
 
-  // При старте: сначала пробуем загрузить с сети, при ошибке — кеш
-  await loadApiProducts(StorageService.loadLastSearch());
+  // Старт: восстанавливаем последний поиск (null если не было)
+  const lastSearch = StorageService.loadLastSearch();
+  if (lastSearch !== null && searchInput) searchInput.value = lastSearch;
+  await loadApiProducts(lastSearch); // null = не показываем ничего
 
-  // ============================================================
-  // Часть 6. Синхронизация + тосты
-  // ============================================================
+  // ── Синхронизация при восстановлении соединения ───────────
   window.addEventListener('online', async () => {
     console.log('[Network] Соединение восстановлено');
     showNetworkToast(
@@ -331,13 +302,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     );
     cart = StorageService.loadCart();
     renderCart();
-    await loadApiProducts(StorageService.loadLastSearch());
+    const q = StorageService.loadLastSearch();
+    if (q !== null) await loadApiProducts(q);
   });
-
   window.addEventListener('offline', () => {
-    console.warn(
-      '[Network] Соединение потеряно. Данные сохранены в LocalStorage.'
-    );
+    console.warn('[Network] Офлайн. Данные сохранены в LocalStorage.');
     showNetworkToast('⚠ Нет соединения. Работаем с кешем.', '#ff9900');
   });
 
@@ -357,24 +326,18 @@ document.addEventListener('DOMContentLoaded', async function () {
       fontWeight: '700',
       zIndex: '9999',
       boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-      animation: 'slideUp 0.3s ease',
     });
     el.textContent = msg;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 3500);
   }
 
-  // ============================================================
-  // Часть 6. Запуск тестов (результаты в консоли DevTools)
-  // ============================================================
+  // ── Часть 6: тесты ───────────────────────────────────────
   await APITester.runAll();
 
-  // ============================================================
-  // Валидация формы
-  // ============================================================
+  // ── Валидация формы ───────────────────────────────────────
   const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
   const validateRequired = v => v.trim().length > 0;
-
   function showError(el, msg) {
     el.style.borderColor = 'red';
     if (!el.parentNode.querySelector('.error-message')) {
@@ -406,7 +369,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     clearErrors(this);
     if (!validateRequired(this.value)) showError(this, 'Напишите сообщение');
   });
-
   contactForm?.addEventListener('submit', function (e) {
     e.preventDefault();
     let ok = true;
@@ -428,12 +390,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   });
 
-  // ============================================================
-  // Бургер-меню
-  // ============================================================
+  // ── Бургер ────────────────────────────────────────────────
   const burger = document.querySelector('.header__burger');
   const mobileMenu = document.querySelector('.header__mobile-menu');
-
   if (burger && mobileMenu) {
     burger.addEventListener('click', () => {
       burger.classList.toggle('header__burger--active');
@@ -444,8 +403,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         ? 'hidden'
         : '';
     });
-    mobileMenu.querySelectorAll('.nav__link').forEach(link =>
-      link.addEventListener('click', () => {
+    mobileMenu.querySelectorAll('.nav__link').forEach(l =>
+      l.addEventListener('click', () => {
         burger.classList.remove('header__burger--active');
         mobileMenu.classList.remove('header__mobile-menu--active');
         document.body.style.overflow = '';
@@ -461,7 +420,6 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 });
 
-// Плавный скролл
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', function (e) {
     const href = this.getAttribute('href');
