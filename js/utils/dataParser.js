@@ -1,163 +1,49 @@
 // js/utils/dataParser.js
+// Утилиты для обработки данных от FakeStore API
 
-// Парсинг JSON с обработкой ошибок
-export const parseJSON = jsonString => {
-  try {
-    return JSON.parse(jsonString);
-  } catch (error) {
-    console.error('JSON parsing error:', error);
-    return null;
-  }
-};
-
-// Форматирование даты в удобный вид (для новостей)
-export const formatDate = dateString => {
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return 'Неверная дата';
-    }
-    return date.toLocaleDateString('ru-RU', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  } catch (error) {
-    console.error('Date formatting error:', error);
-    return 'Ошибка даты';
-  }
-};
-
-// Обрезка текста (чтобы описание новости не ломало карточку)
-export const truncateText = (text, maxLength, useWordBoundary = true) => {
-  if (!text || text.length <= maxLength) return text;
-  let truncated = text.substr(0, maxLength);
-  if (useWordBoundary) {
-    const lastSpace = truncated.lastIndexOf(' ');
-    if (lastSpace > 0) {
-      truncated = truncated.substr(0, lastSpace);
-    }
-  }
-  return truncated + '...';
-};
-
-// Создание HTML-элемента из шаблона данных
-export const createElementFromData = (data, template) => {
-  try {
-    let html = template;
-    Object.keys(data).forEach(key => {
-      const placeholder = `{{${key}}}`;
-      const value =
-        data[key] !== undefined && data[key] !== null ? data[key] : '';
-      html = html.replace(new RegExp(placeholder, 'g'), value);
-    });
-    const templateElement = document.createElement('template');
-    templateElement.innerHTML = html.trim();
-    return templateElement.content.firstElementChild;
-  } catch (error) {
-    console.error('Error creating element from template:', error);
-    return document.createElement('div');
-  }
-};
-
-// Форматирование чисел (цены, рейтинги)
-export const formatNumber = (number, options = {}) => {
-  const defaults = {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
+// Преобразовать товар из FakeStore API в формат нашего приложения
+export function parseProduct(apiProduct) {
+  return {
+    id: apiProduct.id,
+    name: apiProduct.title,
+    price: Math.round(apiProduct.price),
+    category: parseCategoryName(apiProduct.category),
+    image: apiProduct.image,
+    description: apiProduct.description,
+    rating: apiProduct.rating?.rate || 0,
   };
-  return new Intl.NumberFormat('ru-RU', { ...defaults, ...options }).format(
-    number
-  );
-};
+}
 
-// Форматирование валюты
-export const formatCurrency = (amount, currency = 'RUB') => {
-  return new Intl.NumberFormat('ru-RU', {
-    style: 'currency',
-    currency: currency,
-  }).format(amount);
-};
+// Преобразовать категорию API в нашу
+function parseCategoryName(apiCategory) {
+  const map = {
+    electronics: 'electronics',
+    jewelery: 'wearables',
+    "men's clothing": 'clothing',
+    "women's clothing": 'clothing',
+  };
+  return map[apiCategory] || 'other';
+}
 
-// Создание строки запроса из объекта параметров
-export const buildQueryString = params => {
-  const searchParams = new URLSearchParams();
-  Object.keys(params).forEach(key => {
-    if (params[key] !== null && params[key] !== undefined) {
-      searchParams.append(key, params[key]);
-    }
+// Преобразовать массив товаров
+export function parseProducts(apiProducts) {
+  return apiProducts.map(parseProduct);
+}
+
+// Сформировать список уникальных категорий
+export function getCategories(products) {
+  const cats = [...new Set(products.map(p => p.category))];
+  return ['all', ...cats];
+}
+
+// Фильтрация товаров
+export function filterProducts(
+  products,
+  { category = 'all', maxPrice = Infinity } = {}
+) {
+  return products.filter(p => {
+    const matchCategory = category === 'all' || p.category === category;
+    const matchPrice = p.price <= maxPrice;
+    return matchCategory && matchPrice;
   });
-  return searchParams.toString();
-};
-
-// Получение глубоко вложенных значений (например, article.source.name)
-export const getNestedValue = (obj, path, defaultValue = null) => {
-  try {
-    const value = path.split('.').reduce((current, key) => {
-      return current && current[key] !== undefined ? current[key] : undefined;
-    }, obj);
-    return value !== undefined ? value : defaultValue;
-  } catch (error) {
-    console.error('Error getting nested value:', error);
-    return defaultValue;
-  }
-};
-
-// Фильтрация массива объектов
-export const filterData = (data, filters) => {
-  return data.filter(item => {
-    return Object.keys(filters).every(key => {
-      const filterValue = filters[key];
-      const itemValue = item[key];
-      if (
-        filterValue === '' ||
-        filterValue === null ||
-        filterValue === undefined
-      ) {
-        return true;
-      }
-      if (typeof filterValue === 'string') {
-        return itemValue
-          ?.toString()
-          .toLowerCase()
-          .includes(filterValue.toLowerCase());
-      }
-      return itemValue === filterValue;
-    });
-  });
-};
-
-// Сортировка данных (asc/desc)
-export const sortData = (data, key, direction = 'asc') => {
-  return [...data].sort((a, b) => {
-    let aValue = a[key];
-    let bValue = b[key];
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      aValue = aValue.toLowerCase();
-      bValue = bValue.toLowerCase();
-    }
-    if (aValue < bValue) return direction === 'asc' ? -1 : 1;
-    if (aValue > bValue) return direction === 'asc' ? 1 : -1;
-    return 0;
-  });
-};
-
-// Генерация уникального ID
-export const generateId = (prefix = '') => {
-  return (
-    prefix + Date.now().toString(36) + Math.random().toString(36).substr(2)
-  );
-};
-
-// Проверки типов
-export const isObject = value =>
-  value && typeof value === 'object' && !Array.isArray(value);
-export const isArray = value => Array.isArray(value);
-export const isEmpty = value => {
-  if (value === null || value === undefined) return true;
-  if (Array.isArray(value)) return value.length === 0;
-  if (typeof value === 'object') return Object.keys(value).length === 0;
-  return false;
-};
+}

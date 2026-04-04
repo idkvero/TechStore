@@ -1,14 +1,12 @@
-// Конфигурация API для NewsAPI
-export const API_CONFIG = {
-  BASE_URL: 'https://newsapi.org/v2',
-  API_KEY: '1ba3bc98a07a4c4da35157c9abe3c440',
-  DEFAULT_CATEGORY: 'technology',
-  DEFAULT_COUNTRY: 'us',
-  DEFAULT_PAGE_SIZE: 10,
-};
+// js/api/config.js
+// Конфигурация API
+// API-ключи хранятся в .env (для серверных проектов).
+// DummyJSON — публичный API, ключ не требуется.
+// Для Stripe/Shopify: ключ задаётся через переменную окружения,
+// никогда не коммитится в git (.env добавлен в .gitignore).
 
-export const ENDPOINTS = {
-  TOP_HEADLINES: '/top-headlines',
-  EVERYTHING: '/everything',
-  SOURCES: '/top-headlines/sources',
+export const CONFIG = {
+  BASE_URL: 'https://dummyjson.com',
+  PRODUCTS_LIMIT: 12,
+  // API_KEY: process.env.API_KEY  // пример для серверного окружения
 };

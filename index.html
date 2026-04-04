@@ -10,16 +10,645 @@
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/footer.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ── Корзина ── */
+      .cart-toggle {
+        position: relative;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        color: var(--color-text);
+        margin-left: var(--spacing-sm);
+      }
+      .cart__count {
+        position: absolute;
+        top: -6px;
+        right: -8px;
+        background: var(--color-primary);
+        color: #000;
+        font-size: 11px;
+        font-weight: 700;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .cart-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1100;
+      }
+      .cart-overlay--visible {
+        display: block;
+      }
+      .cart-sidebar {
+        position: fixed;
+        top: 0;
+        right: -420px;
+        width: 400px;
+        max-width: 100vw;
+        height: 100vh;
+        background: #111;
+        z-index: 1200;
+        display: flex;
+        flex-direction: column;
+        transition: right 0.3s ease;
+        padding: var(--spacing-lg);
+        box-shadow: -4px 0 30px rgba(0, 0, 0, 0.5);
+      }
+      .cart-sidebar--open {
+        right: 0;
+      }
+      .cart__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-md);
+      }
+      .cart__title {
+        color: var(--color-text);
+        font-size: var(--font-size-xxl);
+        font-weight: var(--font-weight-bold);
+      }
+      .cart__close {
+        background: transparent;
+        border: none;
+        color: var(--color-text);
+        font-size: 24px;
+        cursor: pointer;
+      }
+      .cart__items {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+      }
+      .cart__empty {
+        color: var(--color-text-secondary);
+        text-align: center;
+        margin-top: var(--spacing-xl);
+      }
+      .cart__item {
+        display: flex;
+        gap: var(--spacing-sm);
+        align-items: center;
+        background: #1f1f1f;
+        border-radius: var(--border-radius-sm);
+        padding: var(--spacing-sm);
+      }
+      .cart__item-img {
+        width: 56px;
+        height: 56px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+      .cart__item-info {
+        flex: 1;
+      }
+      .cart__item-name {
+        color: var(--color-text);
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-semibold);
+        display: block;
+        margin-bottom: 6px;
+      }
+      .cart__item-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .cart__qty-btn {
+        width: 24px;
+        height: 24px;
+        background: #333;
+        border: none;
+        border-radius: 4px;
+        color: var(--color-text);
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .cart__qty-btn:hover {
+        background: var(--color-primary);
+        color: #000;
+      }
+      .cart__item-qty {
+        color: var(--color-text);
+        font-weight: 600;
+        min-width: 20px;
+        text-align: center;
+      }
+      .cart__item-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+      }
+      .cart__item-price {
+        color: var(--color-primary);
+        font-weight: 700;
+      }
+      .cart__remove {
+        background: transparent;
+        border: none;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .cart__remove:hover {
+        color: #ff4444;
+      }
+      .cart__footer {
+        border-top: 1px solid #333;
+        padding-top: var(--spacing-md);
+        margin-top: var(--spacing-sm);
+      }
+      .cart__total {
+        display: flex;
+        justify-content: space-between;
+        color: var(--color-text);
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--spacing-md);
+      }
+      .cart__total-price {
+        color: var(--color-primary);
+      }
+      .cart__checkout {
+        width: 100%;
+        padding: var(--spacing-sm);
+        background: var(--color-primary);
+        color: #000;
+        border: none;
+        border-radius: var(--border-radius-pill);
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-bold);
+        cursor: pointer;
+      }
+      .cart__checkout:hover {
+        opacity: 0.85;
+      }
 
+      /* ── Фильтры ── */
+      .filters {
+        background: #0a0a0a;
+        padding: var(--spacing-md) 0;
+        border-bottom: 1px solid #222;
+      }
+      .filters__container {
+        max-width: var(--container-max-width);
+        margin: 0 auto;
+        padding: 0 var(--spacing-lg);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-lg);
+        flex-wrap: wrap;
+      }
+      .filters__label {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-md);
+        white-space: nowrap;
+      }
+      .filter__categories {
+        display: flex;
+        gap: var(--spacing-xs);
+        flex-wrap: wrap;
+      }
+      .filter__category {
+        background: #1f1f1f;
+        border: 1px solid #333;
+        color: var(--color-text);
+        padding: 6px 14px;
+        border-radius: var(--border-radius-pill);
+        font-size: var(--font-size-sm);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .filter__category:hover,
+      .filter__category--active {
+        background: var(--color-primary);
+        color: #000;
+        border-color: var(--color-primary);
+      }
+      .filter__price {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        margin-left: auto;
+      }
+      .filter__price-range {
+        accent-color: var(--color-primary);
+        width: 150px;
+      }
+      .filter__price-value {
+        color: var(--color-primary);
+        font-weight: 700;
+        min-width: 60px;
+      }
+
+      /* ── Слайдер ── */
+      .slider {
+        position: relative;
+        overflow: hidden;
+        background: #0d0d0d;
+        padding: var(--spacing-xxl) 0;
+      }
+      .slider__container {
+        max-width: var(--container-max-width);
+        margin: 0 auto;
+        padding: 0 var(--spacing-lg);
+      }
+      .slider__title {
+        color: var(--color-text);
+        font-size: var(--font-size-xxxl);
+        font-weight: var(--font-weight-bold);
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+      }
+      .slider__track {
+        position: relative;
+        min-height: 280px;
+      }
+      .slider__slide {
+        display: none;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--spacing-xl);
+        background: #1a1a1a;
+        border-radius: var(--border-radius-md);
+        padding: var(--spacing-xl);
+        animation: fadeIn 0.4s ease;
+      }
+      .slider__slide--active {
+        display: flex;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .slider__slide-img {
+        width: 220px;
+        height: 220px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+      .slider__slide-info {
+        flex: 1;
+      }
+      .slider__slide-badge {
+        display: inline-block;
+        background: var(--color-primary);
+        color: #000;
+        font-size: var(--font-size-sm);
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: var(--border-radius-pill);
+        margin-bottom: var(--spacing-sm);
+      }
+      .slider__slide-name {
+        color: var(--color-text);
+        font-size: var(--font-size-xxl);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--spacing-xs);
+      }
+      .slider__slide-desc {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-md);
+        margin-bottom: var(--spacing-md);
+      }
+      .slider__slide-prices {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
+      }
+      .slider__slide-old {
+        color: var(--color-text-secondary);
+        text-decoration: line-through;
+        font-size: var(--font-size-xl);
+      }
+      .slider__slide-new {
+        color: var(--color-primary);
+        font-size: var(--font-size-xxxl);
+        font-weight: 700;
+      }
+      .slider__controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: var(--spacing-md);
+        margin-top: var(--spacing-lg);
+      }
+      .slider__prev,
+      .slider__next {
+        background: #1f1f1f;
+        border: 1px solid #333;
+        color: var(--color-text);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .slider__prev:hover,
+      .slider__next:hover {
+        background: var(--color-primary);
+        color: #000;
+        border-color: var(--color-primary);
+      }
+      .slider__dots {
+        display: flex;
+        gap: 8px;
+      }
+      .slider__dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #444;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .slider__dot--active {
+        background: var(--color-primary);
+      }
+
+      /* ── API секция ── */
+      .api-section {
+        padding: var(--spacing-xxl) 0;
+        background: #050505;
+      }
+      .api-section__container {
+        max-width: var(--container-max-width);
+        margin: 0 auto;
+        padding: 0 var(--spacing-lg);
+      }
+      .api-section__title {
+        color: var(--color-text);
+        font-size: var(--font-size-xxxl);
+        font-weight: var(--font-weight-bold);
+        text-align: center;
+        margin-bottom: var(--spacing-xs);
+      }
+      .api-section__subtitle {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-md);
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+      }
+      .api-search {
+        display: flex;
+        gap: var(--spacing-sm);
+        max-width: 500px;
+        margin: 0 auto var(--spacing-lg);
+        align-items: center;
+      }
+      .api-search__input {
+        flex: 1;
+        background: #1f1f1f;
+        border: 1px solid #333;
+        border-radius: var(--border-radius-pill);
+        color: var(--color-text);
+        font-family: var(--font-main);
+        font-size: var(--font-size-base);
+        padding: var(--spacing-sm) var(--spacing-md);
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .api-search__input:focus {
+        border-color: var(--color-primary);
+      }
+      .api-search__btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        white-space: nowrap;
+      }
+      .api-status {
+        text-align: center;
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--spacing-md);
+        min-height: 20px;
+      }
+      .api-products__grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--spacing-lg);
+      }
+      .api-loading,
+      .api-error,
+      .api-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: var(--spacing-xl);
+        color: var(--color-text-secondary);
+      }
+      .api-error {
+        color: #ff4444;
+      }
+
+      /* ── Скелетон ── */
+      .product-card--skeleton {
+        pointer-events: none;
+      }
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          #1f1f1f 25%,
+          #2a2a2a 50%,
+          #1f1f1f 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite;
+        border-radius: 8px;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+      .skeleton--img {
+        height: 200px;
+        margin-bottom: 16px;
+      }
+      .skeleton--text {
+        height: 18px;
+        margin-bottom: 10px;
+      }
+      .skeleton--short {
+        width: 60%;
+      }
+      .skeleton--btn {
+        height: 36px;
+        width: 120px;
+        margin: 0 auto;
+        border-radius: 25px;
+      }
+      .products__empty,
+      .products__error {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: var(--color-text-secondary);
+        padding: var(--spacing-xl);
+        font-size: var(--font-size-xl);
+      }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
+
+      /* ── Контактная форма ── */
+      .contact {
+        padding: var(--spacing-xxl) 0;
+        background: #0a0a0a;
+      }
+      .contact__container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0 var(--spacing-lg);
+      }
+      .contact__title {
+        color: var(--color-text);
+        font-size: var(--font-size-xxxl);
+        font-weight: var(--font-weight-bold);
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+      }
+      .contact-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: relative;
+      }
+      .form-label {
+        color: var(--color-text-secondary);
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-medium);
+      }
+      .form-input {
+        background: #1f1f1f;
+        border: 1px solid #333;
+        border-radius: var(--border-radius-sm);
+        color: var(--color-text);
+        font-family: var(--font-main);
+        font-size: var(--font-size-base);
+        padding: var(--spacing-sm) var(--spacing-md);
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .form-input:focus {
+        border-color: var(--color-primary);
+      }
+      .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+      .error-message {
+        color: #ff4444;
+        font-size: var(--font-size-sm);
+        margin-top: 4px;
+      }
+      .form-submit {
+        align-self: flex-start;
+        padding: var(--spacing-sm) var(--spacing-xl);
+      }
+      .form-success {
+        text-align: center;
+        padding: var(--spacing-xl);
+        color: var(--color-text);
+      }
+      .form-success__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        background: var(--color-primary);
+        color: #000;
+        border-radius: 50%;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: var(--spacing-md);
+      }
+      .form-success h3 {
+        font-size: var(--font-size-xxl);
+        margin-bottom: var(--spacing-xs);
+      }
+      .form-success p {
+        color: var(--color-text-secondary);
+      }
+
+      @media (max-width: 1024px) {
+        .api-products__grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 768px) {
+        .slider__slide {
+          flex-direction: column;
+          text-align: center;
+        }
+        .slider__slide-img {
+          width: 160px;
+          height: 160px;
+        }
+        .filters__container {
+          gap: var(--spacing-sm);
+        }
+        .filter__price {
+          margin-left: 0;
+        }
+        .cart-sidebar {
+          width: 100vw;
+        }
+        .api-products__grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
   </head>
   <body>
-    <a href="#main-content" class="skip-link">Перейти к основному содержимому</a>
+    <a href="#main-content" class="skip-link"
+      >Перейти к основному содержимому</a
+    >
 
-    <!-- Оверлей корзины -->
     <div class="cart-overlay"></div>
 
-    <!-- Боковая панель корзины -->
     <aside class="cart-sidebar" aria-label="Корзина покупок">
       <div class="cart__header">
         <h2 class="cart__title">🛒 КОРЗИНА</h2>
@@ -37,66 +666,93 @@
 
     <header class="header" itemscope itemtype="https://schema.org/WPHeader">
       <div class="header__container">
-        <a href="/" class="header__logo" aria-label="TechStore — главная страница">TECHSTORE</a>
-
-        <button class="header__burger" aria-label="Открыть меню" aria-expanded="false">
+        <a
+          href="/"
+          class="header__logo"
+          aria-label="TechStore — главная страница"
+          >TECHSTORE</a
+        >
+        <button
+          class="header__burger"
+          aria-label="Открыть меню"
+          aria-expanded="false"
+        >
           <span></span><span></span><span></span>
         </button>
-
         <nav class="header__nav" aria-label="Основная навигация">
           <ul class="nav__list">
-            <li class="nav__item"><a href="#products" class="nav__link">Products</a></li>
-            <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
-            <li class="nav__item"><a href="#contact" class="nav__link">Contact</a></li>
+            <li class="nav__item">
+              <a href="#products" class="nav__link">Products</a>
+            </li>
+            <li class="nav__item"><a href="#api" class="nav__link">Sale</a></li>
+            <li class="nav__item">
+              <a href="#contact" class="nav__link">Contact</a>
+            </li>
           </ul>
         </nav>
-
         <div class="header__auth">
           <button class="cart-toggle" aria-label="Открыть корзину">
-            🛒
-            <span class="cart__count">0</span>
+            🛒<span class="cart__count">0</span>
           </button>
-          <a href="/login" class="header__signin" aria-label="Войти в аккаунт">Sign In</a>
-          <a href="/register" class="header__signup button button--primary" aria-label="Зарегистрироваться">Sign Up</a>
+          <a href="/login" class="header__signin" aria-label="Войти в аккаунт"
+            >Sign In</a
+          >
+          <a href="/register" class="header__signup button button--primary"
+            >Sign Up</a
+          >
         </div>
       </div>
-
       <div class="header__mobile-menu">
         <nav aria-label="Мобильная навигация">
           <ul class="nav__list">
-            <li class="nav__item"><a href="#products" class="nav__link">Products</a></li>
-            <li class="nav__item"><a href="#about" class="nav__link">About</a></li>
-            <li class="nav__item"><a href="#contact" class="nav__link">Contact</a></li>
-            <li class="nav__item"><a href="/login" class="nav__link">Sign In</a></li>
-            <li class="nav__item"><a href="/register" class="nav__link button button--primary">Sign Up</a></li>
+            <li class="nav__item">
+              <a href="#products" class="nav__link">Products</a>
+            </li>
+            <li class="nav__item"><a href="#api" class="nav__link">Sale</a></li>
+            <li class="nav__item">
+              <a href="#contact" class="nav__link">Contact</a>
+            </li>
+            <li class="nav__item">
+              <a href="/login" class="nav__link">Sign In</a>
+            </li>
+            <li class="nav__item">
+              <a href="/register" class="nav__link button button--primary"
+                >Sign Up</a
+              >
+            </li>
           </ul>
         </nav>
       </div>
     </header>
 
     <main class="main" id="main-content" itemprop="mainContentOfPage">
-
       <!-- HERO -->
       <section class="hero" aria-label="Главный баннер">
         <div class="hero__container">
           <h1 class="hero__title">NEXT-GEN TECH</h1>
           <p class="hero__subtitle">Premium gadgets for the digital age</p>
-          <a href="#products" class="hero__button button" aria-label="Перейти к каталогу товаров">SHOP NOW</a>
+          <a href="#products" class="hero__button button">SHOP NOW</a>
         </div>
       </section>
 
-      <!-- СЛАЙДЕР АКЦИОННЫХ ТОВАРОВ -->
+      <!-- СЛАЙДЕР -->
       <section class="slider" aria-labelledby="slider-heading">
         <div class="slider__container">
           <h2 id="slider-heading" class="slider__title">🔥 HOT DEALS</h2>
           <div class="slider__track">
-
             <div class="slider__slide">
-              <img src="images/headphones.png" alt="Cyber Headphones" class="slider__slide-img">
+              <img
+                src="images/headphones.png"
+                alt="Cyber Headphones"
+                class="slider__slide-img"
+              />
               <div class="slider__slide-info">
                 <span class="slider__slide-badge">−25% СКИДКА</span>
                 <h3 class="slider__slide-name">Cyber Headphones</h3>
-                <p class="slider__slide-desc">Беспроводные наушники с активным шумоподавлением и 30 часами автономной работы</p>
+                <p class="slider__slide-desc">
+                  Беспроводные наушники с активным шумоподавлением и 30 часами
+                  автономной работы
+                </p>
                 <div class="slider__slide-prices">
                   <span class="slider__slide-old">$399</span>
                   <span class="slider__slide-new">$299</span>
@@ -104,13 +760,19 @@
                 <button class="button button--primary">ADD TO CART</button>
               </div>
             </div>
-
             <div class="slider__slide">
-              <img src="images/laptop.png" alt="Gaming Laptop" class="slider__slide-img">
+              <img
+                src="images/laptop.png"
+                alt="Gaming Laptop"
+                class="slider__slide-img"
+              />
               <div class="slider__slide-info">
                 <span class="slider__slide-badge">−15% СКИДКА</span>
                 <h3 class="slider__slide-name">Gaming Laptop</h3>
-                <p class="slider__slide-desc">Игровой ноутбук с процессором Intel Core i9 и видеокартой NVIDIA RTX 4080</p>
+                <p class="slider__slide-desc">
+                  Игровой ноутбук с процессором Intel Core i9 и видеокартой
+                  NVIDIA RTX 4080
+                </p>
                 <div class="slider__slide-prices">
                   <span class="slider__slide-old">$1,799</span>
                   <span class="slider__slide-new">$1,499</span>
@@ -118,13 +780,19 @@
                 <button class="button button--primary">ADD TO CART</button>
               </div>
             </div>
-
             <div class="slider__slide">
-              <img src="images/watch.png" alt="Smart Watch Pro" class="slider__slide-img">
+              <img
+                src="images/watch.png"
+                alt="Smart Watch Pro"
+                class="slider__slide-img"
+              />
               <div class="slider__slide-info">
                 <span class="slider__slide-badge">−20% СКИДКА</span>
                 <h3 class="slider__slide-name">Smart Watch Pro</h3>
-                <p class="slider__slide-desc">Умные часы с сенсорным AMOLED-дисплеем и мониторингом сердечного ритма 24/7</p>
+                <p class="slider__slide-desc">
+                  Умные часы с сенсорным AMOLED-дисплеем и мониторингом
+                  сердечного ритма 24/7
+                </p>
                 <div class="slider__slide-prices">
                   <span class="slider__slide-old">$499</span>
                   <span class="slider__slide-new">$399</span>
@@ -132,13 +800,19 @@
                 <button class="button button--primary">ADD TO CART</button>
               </div>
             </div>
-
             <div class="slider__slide">
-              <img src="images/earbuds.png" alt="Wireless Earbuds" class="slider__slide-img">
+              <img
+                src="images/earbuds.png"
+                alt="Wireless Earbuds"
+                class="slider__slide-img"
+              />
               <div class="slider__slide-info">
                 <span class="slider__slide-badge">−10% СКИДКА</span>
                 <h3 class="slider__slide-name">Wireless Earbuds</h3>
-                <p class="slider__slide-desc">Компактные наушники с шумоподавлением и зарядным кейсом на 24 часа</p>
+                <p class="slider__slide-desc">
+                  Компактные наушники с шумоподавлением и зарядным кейсом на 24
+                  часа
+                </p>
                 <div class="slider__slide-prices">
                   <span class="slider__slide-old">$219</span>
                   <span class="slider__slide-new">$199</span>
@@ -146,17 +820,20 @@
                 <button class="button button--primary">ADD TO CART</button>
               </div>
             </div>
-
           </div>
           <div class="slider__controls">
-            <button class="slider__prev" aria-label="Предыдущий слайд">&#8592;</button>
+            <button class="slider__prev" aria-label="Предыдущий слайд">
+              &#8592;
+            </button>
             <div class="slider__dots">
               <button class="slider__dot" aria-label="Слайд 1"></button>
               <button class="slider__dot" aria-label="Слайд 2"></button>
               <button class="slider__dot" aria-label="Слайд 3"></button>
               <button class="slider__dot" aria-label="Слайд 4"></button>
             </div>
-            <button class="slider__next" aria-label="Следующий слайд">&#8594;</button>
+            <button class="slider__next" aria-label="Следующий слайд">
+              &#8594;
+            </button>
           </div>
         </div>
       </section>
@@ -190,92 +867,242 @@
         </div>
       </section>
 
-   <form class="news-search-form">
-  <input type="text" class="news-search-input" placeholder="Поиск новостей...">
-  <button type="submit">Найти</button>
-</form>
-<div class="news__grid"></div> 
-
       <!-- ФИЛЬТРЫ -->
       <div class="filters" role="search" aria-label="Фильтры товаров">
         <div class="filters__container">
           <span class="filters__label">Категория:</span>
           <div class="filter__categories">
-            <button class="filter__category filter__category--active" data-category="all">Все</button>
-            <button class="filter__category" data-category="audio">Аудио</button>
-            <button class="filter__category" data-category="computers">Компьютеры</button>
-            <button class="filter__category" data-category="wearables">Носимые</button>
+            <button
+              class="filter__category filter__category--active"
+              data-category="all"
+            >
+              Все
+            </button>
+            <button class="filter__category" data-category="audio">
+              Аудио
+            </button>
+            <button class="filter__category" data-category="computers">
+              Компьютеры
+            </button>
+            <button class="filter__category" data-category="wearables">
+              Носимые
+            </button>
           </div>
           <div class="filter__price">
             <span class="filters__label">Цена до:</span>
-            <input type="range" class="filter__price-range" min="100" max="1500" value="1500" step="50" aria-label="Максимальная цена">
+            <input
+              type="range"
+              class="filter__price-range"
+              min="100"
+              max="1500"
+              value="1500"
+              step="50"
+              aria-label="Максимальная цена"
+            />
             <span class="filter__price-value">$1500</span>
           </div>
         </div>
       </div>
 
-      <!-- PRODUCTS -->
-      <section class="products" id="products" aria-labelledby="products-heading">
+      <!-- СТАТИЧНЫЕ ТОВАРЫ -->
+      <section
+        class="products"
+        id="products"
+        aria-labelledby="products-heading"
+      >
         <div class="products__container">
-          <h2 id="products-heading" class="products__title">FEATURED PRODUCTS</h2>
+          <h2 id="products-heading" class="products__title">
+            FEATURED PRODUCTS
+          </h2>
           <div class="products__grid">
-
-            <article class="product-card" itemscope itemtype="https://schema.org/Product">
+            <article
+              class="product-card"
+              itemscope
+              itemtype="https://schema.org/Product"
+            >
               <figure class="product-card__figure">
-                <img src="images/headphones.png" alt="Беспроводные наушники Cyber Headphones" class="product-card__image" itemprop="image" />
-                <figcaption class="product-card__caption">Премиальные беспроводные наушники</figcaption>
+                <img
+                  src="images/headphones.png"
+                  alt="Cyber Headphones"
+                  class="product-card__image"
+                  itemprop="image"
+                />
+                <figcaption class="product-card__caption">
+                  Премиальные беспроводные наушники
+                </figcaption>
               </figure>
-              <h3 class="product-card__title" itemprop="name">Cyber Headphones</h3>
-              <p class="product-card__desc" itemprop="description">Беспроводные наушники с активным шумоподавлением и 30 часами автономной работы</p>
-              <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                <p class="product-card__price"><span itemprop="priceCurrency" content="USD">$</span><span itemprop="price" content="299">299</span></p>
+              <h3 class="product-card__title" itemprop="name">
+                Cyber Headphones
+              </h3>
+              <p class="product-card__desc" itemprop="description">
+                Беспроводные наушники с активным шумоподавлением и 30 часами
+                автономной работы
+              </p>
+              <div
+                itemprop="offers"
+                itemscope
+                itemtype="https://schema.org/Offer"
+              >
+                <p class="product-card__price">
+                  <span itemprop="priceCurrency" content="USD">$</span
+                  ><span itemprop="price" content="299">299</span>
+                </p>
               </div>
-              <button class="product-card__button button" aria-label="Добавить Cyber Headphones в корзину">ADD TO CART</button>
+              <button
+                class="product-card__button button"
+                aria-label="Добавить Cyber Headphones в корзину"
+              >
+                ADD TO CART
+              </button>
             </article>
-
-            <article class="product-card" itemscope itemtype="https://schema.org/Product">
+            <article
+              class="product-card"
+              itemscope
+              itemtype="https://schema.org/Product"
+            >
               <figure class="product-card__figure">
-                <img src="images/laptop.png" alt="Игровой ноутбук Gaming Laptop" class="product-card__image" itemprop="image" />
-                <figcaption class="product-card__caption">Мощный игровой ноутбук</figcaption>
+                <img
+                  src="images/laptop.png"
+                  alt="Gaming Laptop"
+                  class="product-card__image"
+                  itemprop="image"
+                />
+                <figcaption class="product-card__caption">
+                  Мощный игровой ноутбук
+                </figcaption>
               </figure>
               <h3 class="product-card__title" itemprop="name">Gaming Laptop</h3>
-              <p class="product-card__desc" itemprop="description">Игровой ноутбук с процессором Intel Core i9 и видеокартой NVIDIA RTX 4080</p>
-              <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                <p class="product-card__price"><span itemprop="priceCurrency" content="USD">$</span><span itemprop="price" content="1499">1,499</span></p>
+              <p class="product-card__desc" itemprop="description">
+                Игровой ноутбук с процессором Intel Core i9 и видеокартой NVIDIA
+                RTX 4080
+              </p>
+              <div
+                itemprop="offers"
+                itemscope
+                itemtype="https://schema.org/Offer"
+              >
+                <p class="product-card__price">
+                  <span itemprop="priceCurrency" content="USD">$</span
+                  ><span itemprop="price" content="1499">1,499</span>
+                </p>
               </div>
-              <button class="product-card__button button" aria-label="Добавить Gaming Laptop в корзину">ADD TO CART</button>
+              <button
+                class="product-card__button button"
+                aria-label="Добавить Gaming Laptop в корзину"
+              >
+                ADD TO CART
+              </button>
             </article>
-
-            <article class="product-card" itemscope itemtype="https://schema.org/Product">
+            <article
+              class="product-card"
+              itemscope
+              itemtype="https://schema.org/Product"
+            >
               <figure class="product-card__figure">
-                <img src="images/watch.png" alt="Умные часы Smart Watch Pro" class="product-card__image" itemprop="image" />
-                <figcaption class="product-card__caption">Умные часы премиум-класса</figcaption>
+                <img
+                  src="images/watch.png"
+                  alt="Smart Watch Pro"
+                  class="product-card__image"
+                  itemprop="image"
+                />
+                <figcaption class="product-card__caption">
+                  Умные часы премиум-класса
+                </figcaption>
               </figure>
-              <h3 class="product-card__title" itemprop="name">Smart Watch Pro</h3>
-              <p class="product-card__desc" itemprop="description">Умные часы с сенсорным AMOLED-дисплеем и мониторингом сердечного ритма 24/7</p>
-              <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                <p class="product-card__price"><span itemprop="priceCurrency" content="USD">$</span><span itemprop="price" content="399">399</span></p>
+              <h3 class="product-card__title" itemprop="name">
+                Smart Watch Pro
+              </h3>
+              <p class="product-card__desc" itemprop="description">
+                Умные часы с сенсорным AMOLED-дисплеем и мониторингом сердечного
+                ритма 24/7
+              </p>
+              <div
+                itemprop="offers"
+                itemscope
+                itemtype="https://schema.org/Offer"
+              >
+                <p class="product-card__price">
+                  <span itemprop="priceCurrency" content="USD">$</span
+                  ><span itemprop="price" content="399">399</span>
+                </p>
               </div>
-              <button class="product-card__button button" aria-label="Добавить Smart Watch Pro в корзину">ADD TO CART</button>
+              <button
+                class="product-card__button button"
+                aria-label="Добавить Smart Watch Pro в корзину"
+              >
+                ADD TO CART
+              </button>
             </article>
-
-            <article class="product-card" itemscope itemtype="https://schema.org/Product">
+            <article
+              class="product-card"
+              itemscope
+              itemtype="https://schema.org/Product"
+            >
               <figure class="product-card__figure">
-                <img src="images/earbuds.png" alt="Беспроводные наушники-вкладыши Wireless Earbuds" class="product-card__image" itemprop="image" />
-                <figcaption class="product-card__caption">Компактные беспроводные наушники</figcaption>
+                <img
+                  src="images/earbuds.png"
+                  alt="Wireless Earbuds"
+                  class="product-card__image"
+                  itemprop="image"
+                />
+                <figcaption class="product-card__caption">
+                  Компактные беспроводные наушники
+                </figcaption>
               </figure>
-              <h3 class="product-card__title" itemprop="name">Wireless Earbuds</h3>
-              <p class="product-card__desc" itemprop="description">Компактные наушники с поддержкой шумоподавления и зарядным кейсом на 24 часа</p>
-              <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                <p class="product-card__price"><span itemprop="priceCurrency" content="USD">$</span><span itemprop="price" content="199">199</span></p>
+              <h3 class="product-card__title" itemprop="name">
+                Wireless Earbuds
+              </h3>
+              <p class="product-card__desc" itemprop="description">
+                Компактные наушники с поддержкой шумоподавления и зарядным
+                кейсом на 24 часа
+              </p>
+              <div
+                itemprop="offers"
+                itemscope
+                itemtype="https://schema.org/Offer"
+              >
+                <p class="product-card__price">
+                  <span itemprop="priceCurrency" content="USD">$</span
+                  ><span itemprop="price" content="199">199</span>
+                </p>
               </div>
-              <button class="product-card__button button" aria-label="Добавить Wireless Earbuds в корзину">ADD TO CART</button>
+              <button
+                class="product-card__button button"
+                aria-label="Добавить Wireless Earbuds в корзину"
+              >
+                ADD TO CART
+              </button>
             </article>
-
           </div>
         </div>
       </section>
-    </main>
+
+      <!-- API СЕКЦИЯ — товары с dummyjson.com (один раз!) -->
+      <section class="api-section" id="api" aria-labelledby="api-heading">
+        <div class="api-section__container">
+          <h2 id="api-heading" class="api-section__title">🌐 ТОВАРЫ ИЗ API</h2>
+          <p class="api-section__subtitle">
+            Данные загружаются с dummyjson.com через Fetch API
+          </p>
+          <div class="api-search">
+            <input
+              type="text"
+              id="api-search-input"
+              class="api-search__input"
+              placeholder="Поиск товаров..."
+              aria-label="Поиск по API"
+            />
+            <button
+              id="api-search-btn"
+              class="api-search__btn button button--primary"
+            >
+              НАЙТИ
+            </button>
+          </div>
+          <p class="api-status" id="api-status"></p>
+          <div class="api-products__grid" id="api-products-grid"></div>
+        </div>
+      </section>
 
       <!-- КОНТАКТНАЯ ФОРМА -->
       <section class="contact" id="contact" aria-labelledby="contact-heading">
@@ -284,17 +1111,36 @@
           <form class="contact-form" novalidate>
             <div class="form-group">
               <label for="contact-name" class="form-label">Имя</label>
-              <input type="text" id="contact-name" name="name" class="form-input" placeholder="Ваше имя">
+              <input
+                type="text"
+                id="contact-name"
+                name="name"
+                class="form-input"
+                placeholder="Ваше имя"
+              />
             </div>
             <div class="form-group">
               <label for="contact-email" class="form-label">Email</label>
-              <input type="email" id="contact-email" name="email" class="form-input" placeholder="your@email.com">
+              <input
+                type="email"
+                id="contact-email"
+                name="email"
+                class="form-input"
+                placeholder="your@email.com"
+              />
             </div>
             <div class="form-group">
               <label for="contact-message" class="form-label">Сообщение</label>
-              <textarea id="contact-message" name="message" class="form-input form-textarea" placeholder="Ваше сообщение..."></textarea>
+              <textarea
+                id="contact-message"
+                name="message"
+                class="form-input form-textarea"
+                placeholder="Ваше сообщение..."
+              ></textarea>
             </div>
-            <button type="submit" class="button button--primary form-submit">ОТПРАВИТЬ</button>
+            <button type="submit" class="button button--primary form-submit">
+              ОТПРАВИТЬ
+            </button>
           </form>
         </div>
       </section>
@@ -302,17 +1148,12 @@
 
     <footer class="footer" itemscope itemtype="https://schema.org/WPFooter">
       <div class="footer__container">
-        <p class="footer__copyright">&copy; 2026 TECHSTORE. ALL RIGHTS RESERVED.</p>
+        <p class="footer__copyright">
+          &copy; 2026 TECHSTORE. ALL RIGHTS RESERVED.
+        </p>
       </div>
     </footer>
 
-
-   <script defer src="js/script.js"></script>
-   <script type="module">
-  import { AppTester } from './js/utils/appTester.js';
-  
-  // Делаем объект глобальным, чтобы можно было вызвать в консоли
-  window.AppTester = AppTester;
-</script>
+    <script type="module" src="js/script.js"></script>
   </body>
 </html>

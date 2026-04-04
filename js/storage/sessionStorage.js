@@ -1,68 +1,53 @@
-// Модуль для работы с sessionStorage
-class SessionStorageService {
-  /**
-   * Сохраняет данные в sessionStorage
-   * @param {string} key - Ключ
-   * @param {*} value - Значение
-   */
-  set(key, value) {
-    try {
-      const serializedValue = JSON.stringify(value);
-      sessionStorage.setItem(key, serializedValue);
-    } catch (error) {
-      console.error('Error saving to sessionStorage:', error);
-    }
-  }
+// js/storage/sessionStorage.js
+// Сервис для работы с SessionStorage
+// SessionStorage хранит данные только в рамках одной вкладки/сессии.
+// Используем для хранения последнего поискового запроса и результатов.
 
-  /**
-   * Получает данные из sessionStorage
-   * @param {string} key - Ключ
-   * @returns {*} - Значение или null
-   */
-  get(key) {
+const SEARCH_KEY = 'techstore_last_search';
+const RESULTS_KEY = 'techstore_search_results';
+
+export const SessionStorageService = {
+  // Сохранить последний поисковый запрос
+  saveSearch(query) {
     try {
-      const serializedValue = sessionStorage.getItem(key);
-      if (serializedValue === null) {
-        return null;
-      }
-      return JSON.parse(serializedValue);
+      sessionStorage.setItem(SEARCH_KEY, query);
+      console.log('Поиск сохранён в SessionStorage:', query);
     } catch (error) {
-      console.error('Error reading from sessionStorage:', error);
+      console.error('Ошибка SessionStorage:', error);
+    }
+  },
+
+  // Загрузить последний поисковый запрос
+  loadSearch() {
+    try {
+      return sessionStorage.getItem(SEARCH_KEY) || '';
+    } catch {
+      return '';
+    }
+  },
+
+  // Сохранить результаты поиска
+  saveResults(results) {
+    try {
+      sessionStorage.setItem(RESULTS_KEY, JSON.stringify(results));
+    } catch (error) {
+      console.error('Ошибка сохранения результатов:', error);
+    }
+  },
+
+  // Загрузить результаты поиска
+  loadResults() {
+    try {
+      const data = sessionStorage.getItem(RESULTS_KEY);
+      return data ? JSON.parse(data) : null;
+    } catch {
       return null;
     }
-  }
+  },
 
-  /**
-   * Удаляет данные из sessionStorage
-   * @param {string} key - Ключ
-   */
-  remove(key) {
-    try {
-      sessionStorage.removeItem(key);
-    } catch (error) {
-      console.error('Error removing from sessionStorage:', error);
-    }
-  }
-
-  /**
-   * Очищает все данные из sessionStorage
-   */
+  // Очистить сессионные данные
   clear() {
-    try {
-      sessionStorage.clear();
-    } catch (error) {
-      console.error('Error clearing sessionStorage:', error);
-    }
-  }
-
-  /**
-   * Проверяет существование ключа
-   * @param {string} key - Ключ
-   * @returns {boolean}
-   */
-  has(key) {
-    return sessionStorage.getItem(key) !== null;
-  }
-}
-
-export const sessionStorageService = new SessionStorageService();
+    sessionStorage.removeItem(SEARCH_KEY);
+    sessionStorage.removeItem(RESULTS_KEY);
+  },
+};
