@@ -190,20 +190,11 @@
         </div>
       </section>
 
-      <section class="api-section container" style="margin-top: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
-    <h2 class="section-title">TECH WORLD NEWS</h2>
-    
-    <form id="api-search-form" class="contact-form" style="max-width: 600px; margin: 0 auto var(--spacing-lg);">
-        <div class="form-group">
-            <input type="text" id="api-search-input" class="form-input" placeholder="Введите тему (например, Apple, AI, Crypto...)" required>
-        </div>
-        <button type="submit" class="button button--primary" style="width: 100%;">НАЙТИ НОВОСТИ</button>
-    </form>
-
-    <div id="api-results-container" class="products-grid">
-        <p style="text-align: center; color: var(--color-text-secondary);">Введите запрос, чтобы получить свежие данные...</p>
-    </div>
-</section>
+   <form class="news-search-form">
+  <input type="text" class="news-search-input" placeholder="Поиск новостей...">
+  <button type="submit">Найти</button>
+</form>
+<div class="news__grid"></div> 
 
       <!-- ФИЛЬТРЫ -->
       <div class="filters" role="search" aria-label="Фильтры товаров">
@@ -316,7 +307,12 @@
     </footer>
 
 
-    <script src="js/components/modal.js"></script>
-    <script type="module" src="js/script.js"></script>
+   <script defer src="js/script.js"></script>
+   <script type="module">
+  import { AppTester } from './js/utils/appTester.js';
+  
+  // Делаем объект глобальным, чтобы можно было вызвать в консоли
+  window.AppTester = AppTester;
+</script>
   </body>
 </html>
