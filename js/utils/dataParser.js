@@ -1,7 +1,3 @@
-// js/utils/dataParser.js
-// Утилиты для обработки данных от FakeStore API
-
-// Преобразовать товар из FakeStore API в формат нашего приложения
 export function parseProduct(apiProduct) {
   return {
     id: apiProduct.id,
@@ -14,7 +10,6 @@ export function parseProduct(apiProduct) {
   };
 }
 
-// Преобразовать категорию API в нашу
 function parseCategoryName(apiCategory) {
   const map = {
     electronics: 'electronics',
@@ -25,18 +20,15 @@ function parseCategoryName(apiCategory) {
   return map[apiCategory] || 'other';
 }
 
-// Преобразовать массив товаров
 export function parseProducts(apiProducts) {
   return apiProducts.map(parseProduct);
 }
 
-// Сформировать список уникальных категорий
 export function getCategories(products) {
   const cats = [...new Set(products.map(p => p.category))];
   return ['all', ...cats];
 }
 
-// Фильтрация товаров
 export function filterProducts(
   products,
   { category = 'all', maxPrice = Infinity } = {}

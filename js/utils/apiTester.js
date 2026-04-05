@@ -1,5 +1,3 @@
-// js/utils/apiTester.js — Часть 6. Тестирование
-
 import { ApiService } from '../api/apiService.js';
 import { StorageService } from '../storage/localStorage.js';
 
@@ -31,7 +29,6 @@ export class APITester {
   static testOfflineFunctionality() {
     console.group('🧪 [APITester] Тест офлайн (LocalStorage)');
 
-    // Тест 1: запись/чтение — используем изолированный тестовый ключ
     StorageService.set('__test_offline__', { test: 'offline_data' });
     const r = StorageService.get('__test_offline__');
     console.log(
@@ -39,7 +36,6 @@ export class APITester {
       r?.test === 'offline_data' ? '✅ PASS' : '❌ FAIL'
     );
 
-    // Тест 2: корзина — сохраняем реальную, тестируем, восстанавливаем
     const realCart = StorageService.loadCart();
     const mockCart = [
       { id: 999, name: 'Test Product', price: 99, qty: 1, image: '' },
@@ -50,9 +46,8 @@ export class APITester {
       '  Тест 2 — корзина:',
       loaded[0]?.id === 999 ? '✅ PASS' : '❌ FAIL'
     );
-    StorageService.saveCart(realCart); // восстанавливаем реальную корзину
+    StorageService.saveCart(realCart);
 
-    // Тест 3: API-кеш — используем изолированный тестовый ключ, НЕ реальный кеш
     const mockProducts = [
       {
         id: 1,
@@ -73,19 +68,16 @@ export class APITester {
       cache?.products?.[0]?.price === 299 ? '✅ PASS' : '❌ FAIL'
     );
 
-    // Тест 4: TTL — свежий кеш не должен быть null
     console.log(
       '  Тест 4 — TTL (свежий кеш):',
       cache !== null ? '✅ PASS' : '❌ FAIL'
     );
 
-    // Тест 5: доступность LocalStorage
     console.log(
       '  Тест 5 — доступность:',
       StorageService.isAvailable() ? '✅ PASS' : '❌ FAIL'
     );
 
-    // Очистка ТОЛЬКО тестовых ключей
     localStorage.removeItem('__test_offline__');
     localStorage.removeItem('__test_cache__');
     console.log('  Тестовые данные очищены (реальный кеш не тронут)');

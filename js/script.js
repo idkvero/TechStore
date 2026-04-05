@@ -1,11 +1,9 @@
-// js/script.js
 import { ApiService } from './api/apiService.js';
 import { StorageService } from './storage/localStorage.js';
 import { SessionStorageService } from './storage/sessionStorage.js';
 import { APITester } from './utils/apiTester.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
-  // ── Корзина ──────────────────────────────────────────────
   let cart = StorageService.loadCart();
 
   function renderCart() {
@@ -126,7 +124,6 @@ document.addEventListener('DOMContentLoaded', async function () {
   });
   renderCart();
 
-  // ── Слайдер ──────────────────────────────────────────────
   const slides = document.querySelectorAll('.slider__slide');
   const dots = document.querySelectorAll('.slider__dot');
   let cur = 0,
@@ -157,7 +154,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     );
   }
 
-  // ── API секция ────────────────────────────────────────────
   const apiGrid = document.getElementById('api-products-grid');
   const apiStatus = document.getElementById('api-status');
   const searchInput = document.getElementById('api-search-input');
@@ -216,7 +212,6 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 
   async function loadApiProducts(query) {
-    // query === null означает "пользователь ещё ничего не искал" — не загружаем
     if (query === null) {
       if (apiGrid) apiGrid.innerHTML = '';
       setStatus('Введите запрос для поиска товаров');
@@ -288,12 +283,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     }, 1200);
   });
 
-  // Старт: восстанавливаем последний поиск (null если не было)
   const lastSearch = StorageService.loadLastSearch();
   if (lastSearch !== null && searchInput) searchInput.value = lastSearch;
   await loadApiProducts(lastSearch); // null = не показываем ничего
 
-  // ── Синхронизация при восстановлении соединения ───────────
   window.addEventListener('online', async () => {
     console.log('[Network] Соединение восстановлено');
     showNetworkToast(
@@ -332,10 +325,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     setTimeout(() => el.remove(), 3500);
   }
 
-  // ── Часть 6: тесты ───────────────────────────────────────
   await APITester.runAll();
 
-  // ── Валидация формы ───────────────────────────────────────
   const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
   const validateRequired = v => v.trim().length > 0;
   function showError(el, msg) {
@@ -390,7 +381,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   });
 
-  // ── Бургер ────────────────────────────────────────────────
   const burger = document.querySelector('.header__burger');
   const mobileMenu = document.querySelector('.header__mobile-menu');
   if (burger && mobileMenu) {

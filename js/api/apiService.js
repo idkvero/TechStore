@@ -1,7 +1,3 @@
-// js/api/apiService.js
-// По заданию: FakeStore API — https://fakestoreapi.com/products/category/electronics
-// Замена: DummyJSON — идентичная структура ответа, работает с localhost без CORS.
-
 import { CONFIG } from './config.js';
 
 async function request(endpoint) {
@@ -12,7 +8,6 @@ async function request(endpoint) {
 }
 
 export const ApiService = {
-  // Загрузка электроники (smartphones + laptops)
   async getProducts() {
     const [phones, laptops] = await Promise.all([
       request('/products/category/smartphones?limit=6'),
@@ -21,7 +16,6 @@ export const ApiService = {
     return [...phones.products, ...laptops.products];
   },
 
-  // Поиск среди электроники
   async searchProducts(query) {
     if (!query) return this.getProducts();
     const data = await request(

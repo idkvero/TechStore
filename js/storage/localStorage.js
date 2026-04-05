@@ -1,11 +1,8 @@
-// js/storage/localStorage.js
-
 const CART_KEY = 'techstore_cart';
 const CACHE_KEY = 'techstore_api_cache';
-const CACHE_TTL = 10 * 60 * 1000; // 10 минут
+const CACHE_TTL = 10 * 60 * 1000;
 
 export const StorageService = {
-  // ── Корзина ──────────────────────────────────────────────
   saveCart(cart) {
     try {
       localStorage.setItem(CART_KEY, JSON.stringify(cart));
@@ -29,8 +26,6 @@ export const StorageService = {
     localStorage.removeItem(CART_KEY);
   },
 
-  // ── API-кеш ───────────────────────────────────────────────
-  // Сохраняется только если пользователь сам делал поиск (query !== null)
   saveApiCache(query, products) {
     try {
       const cache = { query, products, savedAt: Date.now() };
@@ -46,7 +41,6 @@ export const StorageService = {
     }
   },
 
-  // Загружает кеш только если он свежий (< 10 минут)
   loadApiCache() {
     try {
       const data = localStorage.getItem(CACHE_KEY);
@@ -81,7 +75,6 @@ export const StorageService = {
     }
   },
 
-  // ── Универсальные методы (для APITester) ─────────────────
   set(key, value) {
     try {
       localStorage.setItem(key, JSON.stringify(value));
