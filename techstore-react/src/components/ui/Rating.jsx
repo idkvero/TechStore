@@ -1,0 +1,35 @@
+// src/components/ui/Rating.jsx
+// Компонент отображения рейтинга в виде звёзд.
+// Props:
+//   value   — число от 0 до 5 (рейтинг)
+//   reviews — количество отзывов
+//   size    — 'sm' | 'md' (размер звёзд)
+
+import React from 'react'
+
+function Rating({ value = 0, reviews = 0, size = 'md' }) {
+  // Создаём массив из 5 элементов для отрисовки звёзд
+  const stars = Array.from({ length: 5 }, (_, index) => {
+    if (index < Math.floor(value)) return 'full'      // полная звезда
+    if (index < value) return 'half'                  // половина звезды
+    return 'empty'                                     // пустая звезда
+  })
+
+  return (
+    <div className={`rating rating--${size}`}>
+      <div className="rating__stars" aria-label={`Рейтинг ${value} из 5`}>
+        {stars.map((type, index) => (
+          <span key={index} className={`rating__star rating__star--${type}`}>
+            {type === 'full' ? '★' : type === 'half' ? '⯨' : '☆'}
+          </span>
+        ))}
+      </div>
+      <span className="rating__value">{value}</span>
+      {reviews > 0 && (
+        <span className="rating__reviews">({reviews} отзывов)</span>
+      )}
+    </div>
+  )
+}
+
+export default Rating
