@@ -13,9 +13,6 @@ export function parseProduct(apiProduct) {
 function parseCategoryName(apiCategory) {
   const map = {
     electronics: 'electronics',
-    jewelery: 'wearables',
-    "men's clothing": 'clothing',
-    "women's clothing": 'clothing',
   };
   return map[apiCategory] || 'other';
 }
