@@ -1,17 +1,6 @@
-// src/components/features/ShoppingCart.jsx
-// Компонент корзины покупок.
-// Props:
-//   items         — массив товаров в корзине [{ ...product, qty }]
-//   isOpen        — открыта ли боковая панель корзины
-//   onClose       — обработчик закрытия
-//   onRemove      — обработчик удаления товара
-//   onQtyChange   — обработчик изменения количества
+import React from 'react';
+import Button from '../ui/Button.jsx';
 
-import React from 'react'
-import Button from '../ui/Button.jsx'
-
-// Вспомогательный компонент — строка товара в корзине
-// Вынесен отдельно для переиспользуемости и читаемости
 function CartItem({ item, onRemove, onQtyChange }) {
   return (
     <div className="cart-item">
@@ -25,8 +14,8 @@ function CartItem({ item, onRemove, onQtyChange }) {
           <button
             className="cart-item__qty-btn"
             onClick={() => {
-              console.log('Уменьшить количество:', item.name)
-              if (onQtyChange) onQtyChange(item.id, item.qty - 1)
+              console.log('Уменьшить количество:', item.name);
+              if (onQtyChange) onQtyChange(item.id, item.qty - 1);
             }}
           >
             −
@@ -35,8 +24,8 @@ function CartItem({ item, onRemove, onQtyChange }) {
           <button
             className="cart-item__qty-btn"
             onClick={() => {
-              console.log('Увеличить количество:', item.name)
-              if (onQtyChange) onQtyChange(item.id, item.qty + 1)
+              console.log('Увеличить количество:', item.name);
+              if (onQtyChange) onQtyChange(item.id, item.qty + 1);
             }}
           >
             +
@@ -49,8 +38,8 @@ function CartItem({ item, onRemove, onQtyChange }) {
         <button
           className="cart-item__remove"
           onClick={() => {
-            console.log('Удалён из корзины:', item.name)
-            if (onRemove) onRemove(item.id)
+            console.log('Удалён из корзины:', item.name);
+            if (onRemove) onRemove(item.id);
           }}
           aria-label={`Удалить ${item.name}`}
         >
@@ -58,38 +47,37 @@ function CartItem({ item, onRemove, onQtyChange }) {
         </button>
       </div>
     </div>
-  )
+  );
 }
 
-// Главный компонент корзины
-function ShoppingCart({ items = [], isOpen = false, onClose, onRemove, onQtyChange }) {
+function ShoppingCart({
+  items = [],
+  isOpen = false,
+  onClose,
+  onRemove,
+  onQtyChange,
+}) {
+  const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
 
-  // Считаем итоговую сумму — reduce() суммирует price * qty каждого товара
-  const total = items.reduce((sum, item) => sum + item.price * item.qty, 0)
-
-  // Считаем общее количество товаров
-  const totalQty = items.reduce((sum, item) => sum + item.qty, 0)
+  const totalQty = items.reduce((sum, item) => sum + item.qty, 0);
 
   const handleCheckout = () => {
-    console.log('Оформление заказа — в следующем семестре подключим Stripe API')
-    alert(`Заказ на сумму $${total} оформлен! (заглушка)`)
-  }
+    console.log(
+      'Оформление заказа — в следующем семестре подключим Stripe API'
+    );
+    alert(`Заказ на сумму $${total} оформлен! (заглушка)`);
+  };
 
   return (
     <>
-      {/* Оверлей — затемнение фона */}
-      {isOpen && (
-        <div className="cart-overlay" onClick={onClose} />
-      )}
+      {isOpen && <div className="cart-overlay" onClick={onClose} />}
 
-      {/* Боковая панель */}
       <aside className={`cart-sidebar ${isOpen ? 'cart-sidebar--open' : ''}`}>
-
         <div className="cart-sidebar__header">
-          <h2 className="cart-sidebar__title">
-            🛒 Корзина ({totalQty})
-          </h2>
-          <button className="cart-sidebar__close" onClick={onClose}>✕</button>
+          <h2 className="cart-sidebar__title">🛒 Корзина ({totalQty})</h2>
+          <button className="cart-sidebar__close" onClick={onClose}>
+            ✕
+          </button>
         </div>
 
         <div className="cart-sidebar__items">
@@ -118,10 +106,9 @@ function ShoppingCart({ items = [], isOpen = false, onClose, onRemove, onQtyChan
             </Button>
           </div>
         )}
-
       </aside>
     </>
-  )
+  );
 }
 
-export default ShoppingCart
+export default ShoppingCart;

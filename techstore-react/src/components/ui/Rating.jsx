@@ -5,15 +5,14 @@
 //   reviews — количество отзывов
 //   size    — 'sm' | 'md' (размер звёзд)
 
-import React from 'react'
+import React from 'react';
 
 function Rating({ value = 0, reviews = 0, size = 'md' }) {
-  // Создаём массив из 5 элементов для отрисовки звёзд
   const stars = Array.from({ length: 5 }, (_, index) => {
-    if (index < Math.floor(value)) return 'full'      // полная звезда
-    if (index < value) return 'half'                  // половина звезды
-    return 'empty'                                     // пустая звезда
-  })
+    if (index < Math.floor(value)) return 'full';
+    if (index < value) return 'half';
+    return 'empty';
+  });
 
   return (
     <div className={`rating rating--${size}`}>
@@ -29,7 +28,7 @@ function Rating({ value = 0, reviews = 0, size = 'md' }) {
         <span className="rating__reviews">({reviews} отзывов)</span>
       )}
     </div>
-  )
+  );
 }
 
-export default Rating
+export default Rating;
