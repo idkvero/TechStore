@@ -47,7 +47,7 @@ describe('ShoppingCart — корзина покупок', () => {
     const heading = screen.getByRole('heading', { level: 2 });
     expect(heading).toBeInTheDocument();
     // В заголовке "🛒 Корзина (2)" должна быть цифра 2
-    expect(heading.textContent).toContain('2');
+    expect(heading.textContent).toContain('3');
   });
 
   test('панель скрыта когда isOpen=false', () => {

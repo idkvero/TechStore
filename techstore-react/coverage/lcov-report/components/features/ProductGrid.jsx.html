@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">77.77% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>7/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -137,16 +137,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -160,7 +157,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -192,17 +192,17 @@
 import React from 'react'
 import ProductCard from './ProductCard.jsx'
 &nbsp;
-function <span class="fstat-no" title="function not covered" >ProductGrid(</span>{ products = <span class="branch-0 cbranch-no" title="branch not covered" >[],</span> activeCategory = <span class="branch-0 cbranch-no" title="branch not covered" >'all',</span> maxPrice = <span class="branch-0 cbranch-no" title="branch not covered" >9999,</span> onAddToCart }) {
+function ProductGrid({ products = <span class="branch-0 cbranch-no" title="branch not covered" >[],</span> activeCategory = 'all', maxPrice = 9999, onAddToCart }) {
 &nbsp;
   // Фильтрация товаров по категории и цене
   // Это "вычисляемое значение" — просто результат filter() на массиве
-  const filteredProducts = <span class="cstat-no" title="statement not covered" >products.filter(<span class="fstat-no" title="function not covered" >pr</span>oduct =&gt; {</span>
-    const matchCategory = <span class="cstat-no" title="statement not covered" >activeCategory === 'all' || product.category === activeCategory</span>
-    const matchPrice    = <span class="cstat-no" title="statement not covered" >product.price &lt;= maxPrice</span>
-<span class="cstat-no" title="statement not covered" >    return matchCategory &amp;&amp; matchPrice</span>
+  const filteredProducts = products.filter(product =&gt; {
+    const matchCategory = activeCategory === 'all' || <span class="branch-1 cbranch-no" title="branch not covered" >product.category === activeCategory</span>
+    const matchPrice    = product.price &lt;= maxPrice
+    return matchCategory &amp;&amp; matchPrice
   })
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return (</span>
+  return (
     &lt;section className="product-grid" id="products"&gt;
       &lt;div className="product-grid__container"&gt;
 &nbsp;
@@ -216,10 +216,10 @@ function <span class="fstat-no" title="function not covered" >ProductGrid(</span
         {filteredProducts.length &gt; 0 ? (
           // Если товары найдены — рендерим сетку
           &lt;div className="product-grid__grid"&gt;
-            {filteredProducts.map(<span class="fstat-no" title="function not covered" >pr</span>oduct =&gt; (
+            {filteredProducts.map(product =&gt; (
               // Ключ (key) обязателен при рендере списков в React
               // React использует key для эффективного обновления DOM
-<span class="cstat-no" title="statement not covered" >              &lt;ProductCard</span>
+              &lt;ProductCard
                 key={product.id}
                 product={product}
                 onAddToCart={onAddToCart}
@@ -247,7 +247,7 @@ export default ProductGrid
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-06T14:00:10.587Z
+                at 2026-04-20T14:22:36.062Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
