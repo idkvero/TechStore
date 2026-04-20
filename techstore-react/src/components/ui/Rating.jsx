@@ -1,10 +1,3 @@
-// src/components/ui/Rating.jsx
-// Компонент отображения рейтинга в виде звёзд.
-// Props:
-//   value   — число от 0 до 5 (рейтинг)
-//   reviews — количество отзывов
-//   size    — 'sm' | 'md' (размер звёзд)
-
 import React from 'react';
 
 function Rating({ value = 0, reviews = 0, size = 'md' }) {

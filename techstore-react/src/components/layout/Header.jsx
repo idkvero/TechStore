@@ -14,12 +14,10 @@ function Header({ cartCount = 0, onCartOpen }) {
   return (
     <header className="header">
       <div className="header__container">
-        {/* Логотип */}
         <a href="/" className="header__logo">
           TECHSTORE
         </a>
 
-        {/* Навигация */}
         <nav className="header__nav" aria-label="Основная навигация">
           <ul className="nav__list">
             <li className="nav__item">
