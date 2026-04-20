@@ -11,18 +11,16 @@
 export function formatCurrency(price, currency = '$') {
   // Проверяем что price — число и не отрицательное
   if (typeof price !== 'number' || isNaN(price)) {
-    return 'Неверная цена'
+    return 'Неверная цена';
   }
   if (price < 0) {
-    return 'Неверная цена'
+    return 'Неверная цена';
   }
   // toFixed(2) округляет до двух знаков после запятой
   // Убираем лишние нули: 299.00 → 299, 299.50 → 299.50
-  const formatted = price % 1 === 0
-    ? price.toString()
-    : price.toFixed(2)
+  const formatted = price % 1 === 0 ? price.toString() : price.toFixed(2);
 
-  return `${currency}${formatted}`
+  return `${currency}${formatted}`;
 }
 
 /**
@@ -31,17 +29,18 @@ export function formatCurrency(price, currency = '$') {
  * @returns {number} итоговая сумма
  */
 export function calculateTotal(items) {
+  debugger;
   // Проверяем что передан массив
-  if (!Array.isArray(items)) return 0
+  if (!Array.isArray(items)) return 0;
   // Пустая корзина — сумма 0
-  if (items.length === 0) return 0
+  if (items.length === 0) return 0;
 
   // reduce() суммирует price * qty каждого товара
   return items.reduce((sum, item) => {
-    const price = typeof item.price === 'number' ? item.price : 0
-    const qty   = typeof item.qty   === 'number' ? item.qty   : 0
-    return sum + price * qty
-  }, 0)
+    const price = typeof item.price === 'number' ? item.price : 0;
+    const qty = typeof item.qty === 'number' ? item.qty : 0;
+    return sum + price * qty;
+  }, 0);
 }
 
 /**
@@ -51,12 +50,12 @@ export function calculateTotal(items) {
  * @returns {string} обрезанный текст
  */
 export function truncateText(text, maxLength) {
-  if (typeof text !== 'string') return ''
-  if (typeof maxLength !== 'number' || maxLength <= 0) return text
+  if (typeof text !== 'string') return '';
+  if (typeof maxLength !== 'number' || maxLength <= 0) return text;
   // Если текст короче лимита — возвращаем как есть
-  if (text.length <= maxLength) return text
+  if (text.length <= maxLength) return text;
   // Обрезаем и добавляем '...'
-  return text.slice(0, maxLength) + '...'
+  return text.slice(0, maxLength) + '...';
 }
 
 /**
@@ -66,14 +65,18 @@ export function truncateText(text, maxLength) {
  * @param {number} maxPrice - максимальная цена
  * @returns {Array} отфильтрованный массив
  */
-export function filterProducts(products, category = 'all', maxPrice = Infinity) {
-  if (!Array.isArray(products)) return []
+export function filterProducts(
+  products,
+  category = 'all',
+  maxPrice = Infinity
+) {
+  if (!Array.isArray(products)) return [];
 
   return products.filter(product => {
-    const matchCategory = category === 'all' || product.category === category
-    const matchPrice    = product.price <= maxPrice
-    return matchCategory && matchPrice
-  })
+    const matchCategory = category === 'all' || product.category === category;
+    const matchPrice = product.price <= maxPrice;
+    return matchCategory && matchPrice;
+  });
 }
 
 /**
@@ -83,10 +86,10 @@ export function filterProducts(products, category = 'all', maxPrice = Infinity) 
  */
 export function parseJSON(jsonString) {
   try {
-    return JSON.parse(jsonString)
+    return JSON.parse(jsonString);
   } catch {
     // При невалидном JSON возвращаем null вместо ошибки
-    return null
+    return null;
   }
 }
 
@@ -96,9 +99,9 @@ export function parseJSON(jsonString) {
  * @returns {boolean}
  */
 export function validateEmail(email) {
-  if (typeof email !== 'string') return false
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return regex.test(email)
+  if (typeof email !== 'string') return false;
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
 }
 
 /**
@@ -107,8 +110,8 @@ export function validateEmail(email) {
  * @returns {number}
  */
 export function calculateItemCount(items) {
-  if (!Array.isArray(items)) return 0
+  if (!Array.isArray(items)) return 0;
   return items.reduce((sum, item) => {
-    return sum + (typeof item.qty === 'number' ? item.qty : 0)
-  }, 0)
+    return sum + (typeof item.qty === 'number' ? item.qty : 0);
+  }, 0);
 }
